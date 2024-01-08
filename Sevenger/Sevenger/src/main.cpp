@@ -4,11 +4,11 @@
 #include<iostream>
 
 //settings
-const GLuint SCR_WIDTH = 1920;
-const GLuint SCR_HEIGHT = 1080;
+const GLuint SCREEN_WIDTH = 1920;
+const GLuint SCREEN_HEIGHT = 1080;
 
 //vertex shader
-const char* vertexShaderSource = "#version 330 core\n"
+const char* vertex_shader_source = "#version 330 core\n"
 "layout (location = 0) in vec3 aPos;\n"
 "void main()\n"
 "{\n"
@@ -16,15 +16,15 @@ const char* vertexShaderSource = "#version 330 core\n"
 "}\0";
 
 //fragment shader
-const char* fragmentShaderSource = "#version 330 core\n"
-"out vec4 FragColor;\n"
+const char* fragment_shader_source = "#version 330 core\n"
+"out vec4 fragment_color;\n"
 "void main()\n"
 "{\n"
-"   FragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);\n"
+"   fragment_color = vec4(1.0f, 0.0f, 0.0f, 1.0f);\n"
 "}\n\0";
 
 //input
-void processInput(GLFWwindow* window)
+void process_input(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
@@ -46,7 +46,7 @@ int main()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     //glfw window creation
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Solar System", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Solar System", nullptr, nullptr);
     if (window == nullptr)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -65,7 +65,7 @@ int main()
 
     //build and compile vertex shader
     GLuint vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader_id, 1, &vertexShaderSource, nullptr);
+    glShaderSource(vertex_shader_id, 1, &vertex_shader_source, nullptr);
     glCompileShader(vertex_shader_id);
 
     //check for vertex shader compile errors
@@ -80,10 +80,10 @@ int main()
 
     //build and compile fragment shader
     GLuint fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader_id, 1, &fragmentShaderSource, nullptr);
+    glShaderSource(fragment_shader_id, 1, &fragment_shader_source, nullptr);
     glCompileShader(fragment_shader_id);
 
-    // check for shader compile errors
+    //check for fragment shader compile errors
     glGetShaderiv(fragment_shader_id, GL_COMPILE_STATUS, &success);
     if (success == GL_FALSE)
     {
@@ -96,6 +96,7 @@ int main()
     glAttachShader(shader_program, vertex_shader_id);
     glAttachShader(shader_program, fragment_shader_id);
     glLinkProgram(shader_program);
+
     // check for linking errors
     glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
     if (!success) {
@@ -105,7 +106,7 @@ int main()
     glDeleteShader(vertex_shader_id);
     glDeleteShader(fragment_shader_id);
 
-    // set up vertex data (and buffer(s)) and configure vertex attributes
+    //set up vertex data and buffer, configure vertex attributes
     float vertices[] = {
         0.5f,  0.5f, 0.0f,  // top right
         0.5f, -0.5f, 0.0f,  // bottom right
@@ -139,11 +140,10 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    //note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
+    //unbind VBO
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    //You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-    //VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
+    //unbind VAO
     glBindVertexArray(0);
 
     //uncomment this call to draw in wireframe polygons.
@@ -154,7 +154,7 @@ int main()
     {
         //input
         // -----
-        processInput(window);
+        process_input(window);
 
         // render
         // ------
