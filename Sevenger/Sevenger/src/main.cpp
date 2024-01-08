@@ -107,9 +107,15 @@ int main()
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f, // left  
-         0.5f, -0.5f, 0.0f, // right 
-         0.0f,  0.5f, 0.0f  // top   
+        0.5f,  0.5f, 0.0f,  // top right
+        0.5f, -0.5f, 0.0f,  // bottom right
+       -0.5f, -0.5f, 0.0f,  // bottom left
+       -0.5f,  0.5f, 0.0f   // top left    
+    };
+
+    unsigned int indices[] = {
+        0, 1, 3,  // first Triangle
+        1, 2, 3   // second Triangle
     };
 
     //create and bind Vertex Array Object (VAO)
@@ -117,11 +123,17 @@ int main()
     glGenVertexArrays(1, &VAO_id);
     glBindVertexArray(VAO_id);
 
-    //create and bind Vertex Buffer Object (VBO), configure vertex attributes
+    //create and bind Vertex Buffer Object (VBO)
     GLuint VBO_id = 0;
     glGenBuffers(1, &VBO_id);
     glBindBuffer(GL_ARRAY_BUFFER, VBO_id);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    //create and bind Element Buffer Object (EBO)
+    GLuint EBO_id = 0;
+    glGenBuffers(1, &EBO_id);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_id);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     //describe the vertex data layout
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
@@ -152,7 +164,8 @@ int main()
         //draw first triangle
         glUseProgram(shader_program);
         glBindVertexArray(VAO_id);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        //glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         //glfw swap buffers
         glfwSwapBuffers(window);
@@ -164,6 +177,7 @@ int main()
     //optional: de-allocate all resources once they've outlived their purpose
     glDeleteVertexArrays(1, &VAO_id);
     glDeleteBuffers(1, &VBO_id);
+    glDeleteBuffers(1, &EBO_id);
     glDeleteProgram(shader_program);
 
     //glfw terminate, clearing all previously allocated GLFW resources.
