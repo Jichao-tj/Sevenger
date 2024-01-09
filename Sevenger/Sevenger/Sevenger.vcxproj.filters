@@ -35,6 +35,8 @@
     <None Include="assets\triangle_shader.vs" />
     <None Include="assets\texture.fs" />
     <None Include="assets\texture.vs" />
+    <None Include="assets\edge_detection.vs" />
+    <None Include="assets\edge_detection.fs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\Tex_A1x.png">

@@ -106,6 +106,8 @@
     <ClInclude Include="include\Shader.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\edge_detection.fs" />
+    <None Include="assets\edge_detection.vs" />
     <None Include="assets\texture.fs" />
     <None Include="assets\texture.vs" />
     <None Include="assets\triangle_shader.fs" />

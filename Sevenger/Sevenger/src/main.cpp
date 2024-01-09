@@ -15,34 +15,33 @@ void process_input(GLFWwindow* window)
         glfwSetWindowShouldClose(window, true);
 }
 
-//function executes when window size change
+//viewport matches window size
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    //viewport matches window size
     glViewport(0, 0, width, height);
 }
 
-GLuint loadTexture(const char* path) {
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-
+GLuint load_texture(const char* path) {
+    GLuint texture_id;
+    glGenTextures(1, &texture_id);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     int width, height, channels;
     stbi_set_flip_vertically_on_load(true);
     unsigned char* data = stbi_load(path, &width, &height, &channels, 0);
     if (data) {
-        GLenum format = (channels == 3) ? GL_RGB : GL_RGBA;
-
-        glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
-
-        stbi_image_free(data);
     }
     else {
         std::cerr << "Failed to load texture" << std::endl;
     }
 
-    return textureID;
+    stbi_image_free(data);
+    return texture_id;
 }
 
 int main()
@@ -72,11 +71,11 @@ int main()
     }
 
     //build and compile shader
-    Shader shader("assets/texture.vs", "assets/texture.fs");
+    Shader shader("assets/edge_detection.vs", "assets/edge_detection.fs");
 
     //set up vertex data and buffer, configure vertex attributes
     float vertices[] = {
-        // positions          // colors           // texture coords
+          // positions         // colors           // texture coords
           0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
           0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
          -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
@@ -105,19 +104,16 @@ int main()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_id);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    //describe the vertex data layout
-    // position attribute
+    //describe vertex data layout
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    // color attribute
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-    // texture coord attribute
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
-    // load and create a texture 
-    GLuint textureID = loadTexture("assets/Tex_A1x.png");
+    //load and create texture 
+    GLuint texture_ID = load_texture("assets/Tex_A1x.png");
 
     //main loop
     while (!glfwWindowShouldClose(window))
@@ -125,15 +121,14 @@ int main()
         //input
         process_input(window);
 
-        // render
+        //clear
         glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        //draw first triangle
+        //render
+        glBindTexture(GL_TEXTURE_2D, texture_ID);
         shader.use();
-
         glBindVertexArray(VAO_id);
-        //glDrawArrays(GL_TRIANGLES, 0, 3);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         //glfw swap buffers
