@@ -10,17 +10,20 @@ const GLuint SCREEN_HEIGHT = 1080;
 //vertex shader
 const char* vertex_shader_source = "#version 330 core\n"
 "layout (location = 0) in vec3 aPos;\n"
+"out vec4 vertex_color;\n"
 "void main()\n"
 "{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+"   gl_Position = vec4(aPos, 1.0);\n"
+"   vertex_color = vec4(0.5, 0.0, 0.0, 1.0);\n"
 "}\0";
 
 //fragment shader
 const char* fragment_shader_source = "#version 330 core\n"
 "out vec4 fragment_color;\n"
+"uniform vec4 our_color;\n"
 "void main()\n"
 "{\n"
-"   fragment_color = vec4(1.0f, 0.0f, 0.0f, 1.0f);\n"
+"   fragment_color = our_color;\n"
 "}\n\0";
 
 //input
@@ -146,7 +149,7 @@ int main()
     //unbind VAO
     glBindVertexArray(0);
 
-    //uncomment this call to draw in wireframe polygons.
+    //uncomment this call to draw in wireframe polygons
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     //main loop
@@ -163,6 +166,13 @@ int main()
 
         //draw first triangle
         glUseProgram(shader_program);
+
+        // uniform
+        float timeValue = glfwGetTime();
+        float greenValue = sin(timeValue) / 2.0f + 0.5f;
+        int vertexColorLocation = glGetUniformLocation(shader_program, "our_color");
+        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+
         glBindVertexArray(VAO_id);
         //glDrawArrays(GL_TRIANGLES, 0, 3);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -180,7 +190,7 @@ int main()
     glDeleteBuffers(1, &EBO_id);
     glDeleteProgram(shader_program);
 
-    //glfw terminate, clearing all previously allocated GLFW resources.
+    //glfw terminate, clearing all previously allocated GLFW resources
     glfwTerminate();
     return 0;
 }
