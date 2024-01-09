@@ -21,6 +21,9 @@
     <ClCompile Include="..\..\External\glad\src\glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\stb.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Shader.h">
@@ -28,7 +31,9 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="assets\shader.fs" />
-    <None Include="assets\shader.vs" />
+    <None Include="assets\triangle_shader.fs" />
+    <None Include="assets\triangle_shader.vs" />
+    <None Include="assets\texture.fs" />
+    <None Include="assets\texture.vs" />
   </ItemGroup>
 </Project>
