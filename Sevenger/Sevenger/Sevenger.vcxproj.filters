@@ -36,4 +36,9 @@
     <None Include="assets\texture.fs" />
     <None Include="assets\texture.vs" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\Tex_A1x.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>
