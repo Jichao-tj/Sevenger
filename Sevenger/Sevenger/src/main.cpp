@@ -10,20 +10,21 @@ const GLuint SCREEN_HEIGHT = 1080;
 //vertex shader
 const char* vertex_shader_source = "#version 330 core\n"
 "layout (location = 0) in vec3 aPos;\n"
-"out vec4 vertex_color;\n"
+"layout (location = 1) in vec3 aColor;\n"
+"out vec3 our_color;\n"
 "void main()\n"
 "{\n"
 "   gl_Position = vec4(aPos, 1.0);\n"
-"   vertex_color = vec4(0.5, 0.0, 0.0, 1.0);\n"
+"   our_color = aColor;\n"
 "}\0";
 
 //fragment shader
 const char* fragment_shader_source = "#version 330 core\n"
 "out vec4 fragment_color;\n"
-"uniform vec4 our_color;\n"
+"in vec3 our_color;\n"
 "void main()\n"
 "{\n"
-"   fragment_color = our_color;\n"
+"   fragment_color = vec4(our_color, 1.0);\n"
 "}\n\0";
 
 //input
@@ -111,10 +112,9 @@ int main()
 
     //set up vertex data and buffer, configure vertex attributes
     float vertices[] = {
-        0.5f,  0.5f, 0.0f,  // top right
-        0.5f, -0.5f, 0.0f,  // bottom right
-       -0.5f, -0.5f, 0.0f,  // bottom left
-       -0.5f,  0.5f, 0.0f   // top left    
+        0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
+       -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
+        0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top   
     };
 
     unsigned int indices[] = {
@@ -140,8 +140,12 @@ int main()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     //describe the vertex data layout
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    //position
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    //color
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     //unbind VBO
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -174,8 +178,8 @@ int main()
         glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
         glBindVertexArray(VAO_id);
-        //glDrawArrays(GL_TRIANGLES, 0, 3);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         //glfw swap buffers
         glfwSwapBuffers(window);
