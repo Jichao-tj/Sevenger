@@ -31,11 +31,34 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="assets\triangle_shader.fs" />
-    <None Include="assets\triangle_shader.vs" />
-    <None Include="assets\texture.fs" />
-    <None Include="assets\texture.vs" />
-    <None Include="assets\edge_detection.vs" />
-    <None Include="assets\edge_detection.fs" />
+    <None Include="assets\shaders\triangle_shader.fs" />
+    <None Include="assets\shaders\triangle_shader.vs" />
+    <None Include="assets\shaders\texture.fs" />
+    <None Include="assets\shaders\texture.vs" />
+    <None Include="assets\shaders\edge_detection.vs" />
+    <None Include="assets\shaders\edge_detection.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\textures\awesomeface.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\textures\Tex_3.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\textures\Tex_4.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\textures\Tex_5.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\textures\Tex_6.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\textures\Tex_7.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\textures\Tex_8.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

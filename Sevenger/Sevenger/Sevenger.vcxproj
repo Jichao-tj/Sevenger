@@ -106,12 +106,21 @@
     <ClInclude Include="include\Shader.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="assets\edge_detection.fs" />
-    <None Include="assets\edge_detection.vs" />
-    <None Include="assets\texture.fs" />
-    <None Include="assets\texture.vs" />
-    <None Include="assets\triangle_shader.fs" />
-    <None Include="assets\triangle_shader.vs" />
+    <None Include="assets\shaders\edge_detection.fs" />
+    <None Include="assets\shaders\edge_detection.vs" />
+    <None Include="assets\shaders\texture.fs" />
+    <None Include="assets\shaders\texture.vs" />
+    <None Include="assets\shaders\triangle_shader.fs" />
+    <None Include="assets\shaders\triangle_shader.vs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\textures\awesomeface.png" />
+    <Image Include="assets\textures\Tex_3.png" />
+    <Image Include="assets\textures\Tex_4.png" />
+    <Image Include="assets\textures\Tex_5.png" />
+    <Image Include="assets\textures\Tex_6.png" />
+    <Image Include="assets\textures\Tex_7.png" />
+    <Image Include="assets\textures\Tex_8.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

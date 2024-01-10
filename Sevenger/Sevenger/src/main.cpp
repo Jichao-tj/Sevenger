@@ -1,34 +1,60 @@
-#include<glad/glad.h>
-#include<GLFW/glfw3.h>
-#include<stb_image.h>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <stb_image.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "Shader.h"
 
-GLint SCREEN_WIDTH = 1000;
-GLint SCREEN_HEIGHT = 500;
+GLint SCREEN_WIDTH = 800;
+GLint SCREEN_HEIGHT = 600;
+bool detection_on = false;
 
-GLuint load_texture(const char* path) {
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    {
+        glfwSetWindowShouldClose(window, true);
+    }
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+    {
+        detection_on = !detection_on;
+    }
+}
+
+GLuint load_texture(const char* path) 
+{
     GLuint texture_id;
     glGenTextures(1, &texture_id);
-    glBindTexture(GL_TEXTURE_2D, texture_id);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     int width, height, channels;
     stbi_set_flip_vertically_on_load(true);
     unsigned char* data = stbi_load(path, &width, &height, &channels, 0);
     if (data) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        GLenum format;
+        if (channels == 1)
+            format = GL_RED;
+        else if (channels == 3)
+            format = GL_RGB;
+        else if (channels == 4)
+            format = GL_RGBA;
+        else {
+            stbi_image_free(data);
+            return 0; 
+        }
+
+        glBindTexture(GL_TEXTURE_2D, texture_id);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
+
+        stbi_image_free(data);
+        glBindTexture(GL_TEXTURE_2D, 0);  // Unbind the texture
     }
     else {
-        std::cerr << "Failed to load texture" << std::endl;
+        std::cout << "Failed to load texture: " << path << std::endl;
+        return 0;
     }
 
-    stbi_image_free(data);
     return texture_id;
 }
 
@@ -41,7 +67,7 @@ int main()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     //glfw window creation
-    GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Solar System", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Edge Detection", nullptr, nullptr);
     if (window == nullptr)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -58,16 +84,16 @@ int main()
     }
 
     //build and compile shader
-    Shader edge_detection("assets/edge_detection.vs", "assets/edge_detection.fs");
-    Shader texture_shader("assets/texture.vs", "assets/texture.fs");
+    Shader edge_detection("assets/shaders/edge_detection.vs", "assets/shaders/edge_detection.fs");
+    Shader texture_shader("assets/shaders/texture.vs"       , "assets/shaders/texture.fs");
 
     //set up vertex data and buffer, configure vertex attributes
     float vertices[] = {
           // positions         // colors           // texture coords
-          1.0f,  1.0f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
-          1.0f, -1.0f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
-         -1.0f, -1.0f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
-         -1.0f,  1.0f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left   
+          0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
+          0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
+         -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
+         -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left   
     };
 
     unsigned int indices[] = {
@@ -101,10 +127,11 @@ int main()
     glEnableVertexAttribArray(2);
 
     //load and create texture 
-    GLuint texture_ID = load_texture("assets/world_map.png");
-
-    bool detection_on = false;
-
+    GLuint texture_ID = load_texture("assets/textures/world_map.png");
+    //GLuint texture_ID = load_texture("assets/textures/Tex_A1x.png");
+    //GLuint texture_ID = load_texture("assets/textures/awesomeface.png");
+    //GLuint texture_ID = load_texture("assets/textures/Tex_4.png");
+ 
     //main loop
     while (!glfwWindowShouldClose(window))
     {
@@ -112,15 +139,8 @@ int main()
         glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
         //process input
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        {
-            glfwSetWindowShouldClose(window, true);
-        }
-        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        {
-            detection_on = !detection_on;
-        }
-
+        glfwSetKeyCallback(window, key_callback);
+        
         //clear
         glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -146,4 +166,3 @@ int main()
     glfwTerminate();
     return 0;
 }
-
