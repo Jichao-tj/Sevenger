@@ -1,7 +1,9 @@
 #pragma once
 
 #include <glad/glad.h>
-
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -98,6 +100,11 @@ public:
     void set_float(const std::string& name, float value) const
     {
         glUniform1f(glGetUniformLocation(shader_program_id, name.c_str()), value);
+    }
+
+    void setVec2(const std::string& name, const glm::vec2& value) const
+    {
+        glUniform2fv(glGetUniformLocation(shader_program_id, name.c_str()), 1, &value[0]);
     }
 
 private:

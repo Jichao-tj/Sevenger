@@ -38,9 +38,4 @@
     <None Include="assets\edge_detection.vs" />
     <None Include="assets\edge_detection.fs" />
   </ItemGroup>
-  <ItemGroup>
-    <Image Include="assets\Tex_A1x.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-  </ItemGroup>
 </Project>

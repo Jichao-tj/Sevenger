@@ -1,25 +1,13 @@
 #include<glad/glad.h>
 #include<GLFW/glfw3.h>
 #include<stb_image.h>
-
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include "Shader.h"
 
-//settings
-const GLuint SCREEN_WIDTH = 800;
-const GLuint SCREEN_HEIGHT = 600;
-
-//input
-void process_input(GLFWwindow* window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-}
-
-//viewport matches window size
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
-}
+GLint SCREEN_WIDTH = 1000;
+GLint SCREEN_HEIGHT = 500;
 
 GLuint load_texture(const char* path) {
     GLuint texture_id;
@@ -61,7 +49,6 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     //glad load OpenGL function pointers
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -71,15 +58,16 @@ int main()
     }
 
     //build and compile shader
-    Shader shader("assets/edge_detection.vs", "assets/edge_detection.fs");
+    Shader edge_detection("assets/edge_detection.vs", "assets/edge_detection.fs");
+    Shader texture_shader("assets/texture.vs", "assets/texture.fs");
 
     //set up vertex data and buffer, configure vertex attributes
     float vertices[] = {
           // positions         // colors           // texture coords
-          0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
-          0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
-         -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
-         -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left   
+          1.0f,  1.0f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
+          1.0f, -1.0f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
+         -1.0f, -1.0f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
+         -1.0f,  1.0f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left   
     };
 
     unsigned int indices[] = {
@@ -113,13 +101,25 @@ int main()
     glEnableVertexAttribArray(2);
 
     //load and create texture 
-    GLuint texture_ID = load_texture("assets/Tex_A1x.png");
+    GLuint texture_ID = load_texture("assets/world_map.png");
+
+    bool detection_on = false;
 
     //main loop
     while (!glfwWindowShouldClose(window))
     {
-        //input
-        process_input(window);
+        glfwGetFramebufferSize(window, &SCREEN_WIDTH, &SCREEN_HEIGHT);
+        glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+        //process input
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        {
+            glfwSetWindowShouldClose(window, true);
+        }
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        {
+            detection_on = !detection_on;
+        }
 
         //clear
         glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
@@ -127,7 +127,7 @@ int main()
 
         //render
         glBindTexture(GL_TEXTURE_2D, texture_ID);
-        shader.use();
+        (detection_on) ? edge_detection.use() : texture_shader.use();
         glBindVertexArray(VAO_id);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -138,12 +138,11 @@ int main()
         glfwPollEvents();
     }
 
-    //optional: de-allocate all resources once they've outlived their purpose
+    //de-allocate
     glDeleteVertexArrays(1, &VAO_id);
     glDeleteBuffers(1, &VBO_id);
     glDeleteBuffers(1, &EBO_id);
 
-    //glfw terminate, clearing all previously allocated GLFW resources
     glfwTerminate();
     return 0;
 }

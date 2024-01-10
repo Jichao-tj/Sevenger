@@ -113,9 +113,6 @@
     <None Include="assets\triangle_shader.fs" />
     <None Include="assets\triangle_shader.vs" />
   </ItemGroup>
-  <ItemGroup>
-    <Image Include="assets\Tex_A1x.png" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
